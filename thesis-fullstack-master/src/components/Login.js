@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { Redirect } from 'react-router-dom'
-import { Alert } from "react-bootstrap";
 import { authenticateUser, initializeDefaultData } from "../utils/localStorage";
 
 export default class Login extends Component {

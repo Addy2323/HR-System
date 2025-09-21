@@ -107,7 +107,7 @@ export default class EmployeeViewEmployee extends Component {
                     <Col lg={12}>
                         <Row className="pt-4">
                             <Col lg={3}>
-                                <img className="img-circle elevation-1 bp-2" src={process.env.PUBLIC_URL + '/user-128.png'}></img>
+                                <img className="img-circle elevation-1 bp-2" src={process.env.PUBLIC_URL + '/user-128.png'} alt=""></img>
                             </Col>
                             <Col className="pt-4" lg={9}>
                                 <div className="emp-view-list">

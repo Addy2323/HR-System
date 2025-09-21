@@ -58,7 +58,7 @@ export default class RecentApplications extends React.Component {
                 <li style={{ listStyle: "none", height: '50px'}} key={app.id} className="mt-1 mb-2">
                   <h5>
                     <div className="float-left mr-1">
-                      <img src={process.env.PUBLIC_URL + '/user-40.png'}></img>
+                      <img src={process.env.PUBLIC_URL + '/user-40.png'} alt=""></img>
                     </div>
                     <span>{app.user.fullName} </span>
                     <small>({app.type})</small>

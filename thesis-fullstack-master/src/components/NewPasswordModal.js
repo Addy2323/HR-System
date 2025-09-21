@@ -1,10 +1,6 @@
 import React, { Component } from "react";
-import { Redirect } from 'react-router-dom'
 import { Modal, Button, Form } from "react-bootstrap";
 import { toast } from 'react-toastify';
-import moment from 'moment'
-import DatePicker from 'react-datepicker'
-import "react-datepicker/dist/react-datepicker.css"
 import { updateUserInStorage } from '../utils/localStorage'
 
 export default class NewPasswordModal extends Component {
@@ -35,10 +31,6 @@ export default class NewPasswordModal extends Component {
         toast.error("Passwords don't match.");
     } else {
         let userId = JSON.parse(localStorage.getItem('user')).id
-        let data = {
-          oldPassword: this.state.oldPassword,
-          newPassword: this.state.newPassword
-        }
         
         try {
           // For demo purposes, we'll just update the user's password in localStorage
@@ -57,7 +49,7 @@ export default class NewPasswordModal extends Component {
   };
 
   render() {
-    const {showAlert, completed, hasError, errMsg} = this.state  
+  
     return (
       <Modal
         {...this.props}

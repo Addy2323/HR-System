@@ -1,16 +1,11 @@
 import React, { Component } from "react";
-import { Card, Button, Form, Alert, Badge } from "react-bootstrap";
+import { Card, Button, Form } from "react-bootstrap";
 import { toast } from 'react-toastify';
-import { Redirect } from 'react-router-dom'
-import JobAddModal from './JobAddModal'
-import JobEditModal from './JobEditModal'
-import JobDeleteModal from './JobDeleteModal'
 import moment from 'moment'
 import DatePicker from 'react-datepicker'
 import MaterialTable from 'material-table'
 import { ThemeProvider } from '@material-ui/core'
 import { createMuiTheme } from '@material-ui/core/styles'
-import AlertModal from './AlertModal'
 import { getDepartments, getUsers, getSalaryDetails, addPaymentToStorage } from '../utils/localStorage'
 
 export default class Payment extends Component {
@@ -75,6 +70,7 @@ export default class Payment extends Component {
         
         this.state.users.map((user, index) => {
             items.push(<option key={index} value={user.id}>{user.fullName}</option>)
+            return null;
         })
 
         return items
@@ -95,6 +91,7 @@ export default class Payment extends Component {
             if(user.id == event.target.value) {
                 this.setState({selectedUser: event.target.value})
             }
+            return null;
         })
     }
 
@@ -144,9 +141,11 @@ export default class Payment extends Component {
                         if(new Date(job.startDate).setHours(0) < new Date() && new Date(job.endDate).setHours(24) > new Date()) {
                             currentJobId = job.id
                         }
+                        return null;
                     })
                 }
             }
+            return null;
         })
 
         let newPayment = {
