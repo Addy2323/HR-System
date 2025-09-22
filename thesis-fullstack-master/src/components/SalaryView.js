@@ -18,26 +18,54 @@ export default class SalaryView extends Component {
 
   componentDidMount() {
       if(this.props.location.state) {
-          // Use localStorage instead of axios
+          // Get user and salary details from localStorage
           const allUsers = getUsers();
-          const user = allUsers.find(u => u.id == this.props.location.state.selectedUser.user.id);
+          const salaryDetails = getSalaryDetails();
           
-          if (user) {
-              this.setState({user: user}, () => {
-                  // Simulate job data if needed
-                  if(user.jobs) {
-                      user.jobs.map(job => {
-                          if(new Date(job.startDate).setHours(0) < new Date() && new Date(job.endDate).setHours(24) > new Date()) {
-                              this.setState({currentJobTitle: job.jobTitle})
-                          }
-                      })
+          let userId = null;
+          if (this.props.location.state.selectedUser.user) {
+              userId = this.props.location.state.selectedUser.user.id;
+          } else if (this.props.location.state.selectedUser.id) {
+              userId = this.props.location.state.selectedUser.id;
+          }
+          
+          const user = allUsers.find(u => u.id == userId);
+          const userSalary = salaryDetails.find(s => s.userId == userId);
+          
+          if (user && userSalary) {
+              // Combine user data with salary details
+              const combinedUser = {
+                  ...user,
+                  fullName: `${user.firstName} ${user.lastName}`,
+                  department: { departmentName: user.department || 'N/A' },
+                  user_financial_info: {
+                      employmentType: userSalary.employmentType || 'Full Time',
+                      salaryBasic: userSalary.salaryBasic || 0,
+                      allowanceHouseRent: userSalary.allowanceHouseRent || 0,
+                      allowanceMedical: userSalary.allowanceMedical || 0,
+                      allowanceSpecial: userSalary.allowanceSpecial || 0,
+                      allowanceFuel: userSalary.allowanceFuel || 0,
+                      allowancePhoneBill: userSalary.allowancePhoneBill || 0,
+                      allowanceOther: userSalary.allowanceOther || 0,
+                      allowanceTotal: userSalary.allowanceTotal || 0,
+                      deductionTax: userSalary.deductionTax || 0,
+                      deductionOther: userSalary.deductionOther || 0,
+                      deductionTotal: userSalary.deductionTotal || 0,
+                      salaryGross: userSalary.salaryGross || 0,
+                      salaryNet: userSalary.salaryNet || 0
                   }
-              })
+              };
+              
+              this.setState({
+                  user: combinedUser,
+                  currentJobTitle: user.position || 'Employee'
+              });
           } else {
-              this.setState({falseRedirect: true})
+              console.error('User or salary details not found:', { userId, user, userSalary });
+              this.setState({falseRedirect: true});
           }
       } else {
-          this.setState({falseRedirect: true})
+          this.setState({falseRedirect: true});
       }
   }
 
