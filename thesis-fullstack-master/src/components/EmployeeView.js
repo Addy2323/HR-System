@@ -45,30 +45,41 @@ export default class EmployeeView extends Component {
           
           if (user) {
               this.setState({user: user}, () => {
-                  // Simulate job data if needed
-                  if(user.jobs) {
-                      let jobs = user.jobs
-                      jobs.map(job => {
-                          if(new Date(job.startDate) <= Date.now() && new Date(job.endDate) >= Date.now()) {
-                              this.setState({job: job})
-                          }
-                      })
-                  }
-                  // Simulate department data if needed
-                  if(user.department) {
-                      this.setState({department: user.department})
-                  }
-                  // Simulate personal info if needed
-                  if(user.user_personal_info) {
-                      if(user.user_personal_info.dateOfBirth) {
-                          user.user_personal_info.dateOfBirth = moment(user.user_personal_info.dateOfBirth).format('D MMM YYYY')
-                      }
-                      this.setState({userPersonalInfo: user.user_personal_info})
-                  }
-                  // Simulate financial info if needed
-                  if(user.user_financial_info) {
-                      this.setState({userFinancialInfo: user.user_financial_info})
-                  }
+                  // Map job data from user properties
+                  const jobData = {
+                      jobTitle: user.position || user.jobTitle || 'N/A'
+                  };
+                  this.setState({job: jobData});
+                  
+                  // Map department data
+                  const departmentData = {
+                      departmentName: user.department || 'N/A'
+                  };
+                  this.setState({department: departmentData});
+                  
+                  // Map personal info from user properties
+                  const personalInfo = {
+                      dateOfBirth: user.dateOfBirth ? moment(user.dateOfBirth).format('D MMM YYYY') : 'N/A',
+                      gender: user.gender || 'N/A',
+                      maritalStatus: user.maritalStatus || 'N/A',
+                      fatherName: user.fatherName || 'N/A',
+                      country: user.country || 'N/A',
+                      city: user.city || 'N/A',
+                      address: user.address || 'N/A',
+                      mobile: user.mobile || user.phone || 'N/A',
+                      phone: user.phone || '',
+                      emailAddress: user.email || user.emailAddress || 'N/A'
+                  };
+                  this.setState({userPersonalInfo: personalInfo});
+                  
+                  // Map financial info from user properties
+                  const financialInfo = {
+                      bankName: user.bankName || 'N/A',
+                      accountName: user.accountName || 'N/A',
+                      accountNumber: user.accountNumber || 'N/A',
+                      iban: user.iban || 'N/A'
+                  };
+                  this.setState({userFinancialInfo: financialInfo});
               })
           } else {
               this.setState({falseRedirect: true})
@@ -218,7 +229,7 @@ export default class EmployeeView extends Component {
                                                         </Form.Group>
                                                         <Form.Group as={Row}>
                                                             <Form.Label className="label">
-                                                                Mobile: 
+                                                                Account Number: 
                                                             </Form.Label>
                                                             <span>
                                                                 {this.state.userFinancialInfo.accountNumber}

@@ -138,11 +138,13 @@ export default class ApplicationList extends Component {
     // Transform data to match expected format
     const transformedApplications = applications.map(app => {
       const employee = employees.find(emp => emp.id === app.employeeId);
+      const fullName = employee ? `${employee.firstName} ${employee.lastName}` : app.employeeName || 'Unknown';
+      
       return {
         id: app.id,
         user: {
           id: app.employeeId,
-          fullName: app.employeeName || (employee ? `${employee.firstName} ${employee.lastName}` : 'Unknown')
+          fullName: fullName
         },
         startDate: moment(app.startDate).format('YYYY-MM-DD'),
         endDate: moment(app.endDate).format('YYYY-MM-DD'),
@@ -259,24 +261,25 @@ export default class ApplicationList extends Component {
                               
                               if (!isOwnApplication && isPending) {
                                 return (
-                                  <>
+                                  <div className="d-flex gap-2">
                                     <Button 
                                       onClick={this.onApprove(rowData)} 
                                       variant="success" 
                                       size="sm" 
                                       className="mr-2"
+                                      style={{minWidth: '80px'}}
                                     >
                                       <i className="fas fa-check"></i> Approve
                                     </Button>
                                     <Button 
                                       onClick={this.onReject(rowData)} 
                                       variant="danger" 
-                                      size="sm" 
-                                      className="ml-2"
+                                      size="sm"
+                                      style={{minWidth: '70px'}}
                                     >
                                       <i className="fas fa-times"></i> Reject
                                     </Button>
-                                  </>
+                                  </div>
                                 );
                               }
                               return <span className="text-muted">No actions available</span>;

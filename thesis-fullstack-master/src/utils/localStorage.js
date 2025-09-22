@@ -130,11 +130,71 @@ export const initializeDefaultData = () => {
   // Initialize jobs
   if (!getItem(STORAGE_KEYS.JOBS)) {
     const defaultJobs = [
-      { id: 1, title: 'Software Developer', department: 'Information Technology', salary: 'TSh 1,200,000', description: 'Develop and maintain software applications' },
-      { id: 2, title: 'HR Manager', department: 'Human Resources', salary: 'TSh 1,500,000', description: 'Manage human resources operations' },
-      { id: 3, title: 'Sales Representative', department: 'Sales', salary: 'TSh 800,000', description: 'Handle sales and customer relations' },
-      { id: 4, title: 'Marketing Specialist', department: 'Marketing', salary: 'TSh 900,000', description: 'Plan and execute marketing campaigns' },
-      { id: 5, title: 'Accountant', department: 'Finance', salary: 'TSh 1,000,000', description: 'Manage financial records and transactions' }
+      { 
+        id: 1, 
+        title: 'Software Developer', 
+        jobTitle: 'Software Developer',
+        department: 'Information Technology', 
+        departmentId: 2,
+        employeeId: 4,
+        salary: 'TSh 1,200,000', 
+        description: 'Develop and maintain software applications',
+        startDate: '2024-01-01',
+        endDate: '2025-12-31',
+        employeeName: 'John Doe'
+      },
+      { 
+        id: 2, 
+        title: 'HR Manager', 
+        jobTitle: 'HR Manager',
+        department: 'Human Resources', 
+        departmentId: 1,
+        employeeId: 2,
+        salary: 'TSh 1,500,000', 
+        description: 'Manage human resources operations',
+        startDate: '2024-01-01',
+        endDate: '2025-12-31',
+        employeeName: 'Jane Smith'
+      },
+      { 
+        id: 3, 
+        title: 'Sales Representative', 
+        jobTitle: 'Sales Representative',
+        department: 'Sales', 
+        departmentId: 3,
+        employeeId: null,
+        salary: 'TSh 800,000', 
+        description: 'Handle sales and customer relations',
+        startDate: '2024-01-01',
+        endDate: '2025-12-31',
+        employeeName: 'Unassigned'
+      },
+      { 
+        id: 4, 
+        title: 'Marketing Specialist', 
+        jobTitle: 'Marketing Specialist',
+        department: 'Marketing', 
+        departmentId: 4,
+        employeeId: 5,
+        salary: 'TSh 900,000', 
+        description: 'Plan and execute marketing campaigns',
+        startDate: '2024-01-01',
+        endDate: '2025-12-31',
+        employeeName: 'Jane Smith'
+      },
+      { 
+        id: 5, 
+        title: 'Accountant', 
+        jobTitle: 'Accountant',
+        department: 'Finance', 
+        departmentId: 5,
+        employeeId: null,
+        salary: 'TSh 1,000,000', 
+        description: 'Manage financial records and transactions',
+        startDate: '2024-01-01',
+        endDate: '2025-12-31',
+        employeeName: 'Unassigned'
+      }
     ];
     setItem(STORAGE_KEYS.JOBS, defaultJobs);
   }
@@ -175,12 +235,23 @@ export const initializeDefaultData = () => {
     const defaultApplications = [
       {
         id: 1,
-        employeeId: 1,
+        employeeId: 2,
         employeeName: 'John Doe',
         type: 'Leave',
         reason: 'Annual Leave',
         startDate: '2024-01-20',
         endDate: '2024-01-25',
+        status: 'pending',
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: 175853100236,
+        employeeId: 5,
+        employeeName: 'Jane Smith',
+        type: 'student',
+        reason: 'sijui',
+        startDate: '2025-09-24',
+        endDate: '2026-01-24',
         status: 'pending',
         createdAt: new Date().toISOString()
       }
@@ -208,11 +279,16 @@ export const initializeDefaultData = () => {
   if (!getItem(STORAGE_KEYS.EXPENSES)) {
     const defaultExpenses = [
       {
-        id: 1,
-        description: 'Office Supplies',
-        amount: 150000,
-        category: 'Office',
-        date: '2024-01-15',
+        id: 175853061951,
+        expenseItemName: 'wall',
+        expenseItemStore: 'fifi',
+        amount: 100000,
+        date: '2025-09-25',
+        departmentId: 1,
+        department: {
+          departmentName: 'Information Technology'
+        },
+        userId: 2,
         status: 'approved'
       }
     ];
@@ -271,9 +347,14 @@ export const initializeDefaultData = () => {
 };
 
 // User management functions
-export const authenticateUser = (username, password) => {
+export const authenticateUser = (usernameOrId, password) => {
   const users = getItem(STORAGE_KEYS.USERS, []);
-  const user = users.find(u => u.username === username && u.password === password);
+  
+  // Check if login is by username or employee ID
+  const user = users.find(u => 
+    (u.username === usernameOrId || u.id.toString() === usernameOrId) && 
+    u.password === password
+  );
   
   if (user) {
     const userSession = {
@@ -297,7 +378,7 @@ export const authenticateUser = (username, password) => {
   }
   return {
     success: false,
-    message: 'Invalid username or password'
+    message: 'Invalid employee ID/username or password'
   };
 };
 
@@ -319,16 +400,92 @@ export const getPayments = () => getItem(STORAGE_KEYS.PAYMENTS, []);
 export const getExpenses = () => getItem(STORAGE_KEYS.EXPENSES, []);
 export const getAnnouncements = () => getItem(STORAGE_KEYS.ANNOUNCEMENTS, []);
 export const getEvents = () => getItem(STORAGE_KEYS.EVENTS, []);
-export const getSalaryDetails = () => getItem(STORAGE_KEYS.SALARY_DETAILS, []);
+export const getSalaryDetails = () => {
+  const salaryDetails = getItem(STORAGE_KEYS.SALARY_DETAILS) || [];
+  
+  // Initialize with default salary details if empty
+  if (salaryDetails.length === 0) {
+    const defaultSalaryDetails = [
+      {
+        id: 1,
+        userId: 1,
+        employmentType: 'Full Time',
+        salaryBasic: 800000,
+        allowanceHouseRent: 200000,
+        allowanceMedical: 50000,
+        allowanceSpecial: 100000,
+        allowanceFuel: 75000,
+        allowancePhoneBill: 25000,
+        allowanceOther: 50000,
+        allowanceTotal: 500000,
+        deductionTax: 120000,
+        deductionOther: 30000,
+        deductionTotal: 150000,
+        salaryGross: 1300000,
+        salaryNet: 1150000
+      },
+      {
+        id: 2,
+        userId: 2,
+        employmentType: 'Full Time',
+        salaryBasic: 1000000,
+        allowanceHouseRent: 250000,
+        allowanceMedical: 75000,
+        allowanceSpecial: 150000,
+        allowanceFuel: 100000,
+        allowancePhoneBill: 30000,
+        allowanceOther: 75000,
+        allowanceTotal: 680000,
+        deductionTax: 180000,
+        deductionOther: 50000,
+        deductionTotal: 230000,
+        salaryGross: 1680000,
+        salaryNet: 1450000
+      },
+      {
+        id: 3,
+        userId: 3,
+        employmentType: 'Full Time',
+        salaryBasic: 600000,
+        allowanceHouseRent: 150000,
+        allowanceMedical: 40000,
+        allowanceSpecial: 75000,
+        allowanceFuel: 50000,
+        allowancePhoneBill: 20000,
+        allowanceOther: 35000,
+        allowanceTotal: 370000,
+        deductionTax: 90000,
+        deductionOther: 20000,
+        deductionTotal: 110000,
+        salaryGross: 970000,
+        salaryNet: 860000
+      }
+    ];
+    setItem(STORAGE_KEYS.SALARY_DETAILS, defaultSalaryDetails);
+    return defaultSalaryDetails;
+  }
+  
+  return salaryDetails;
+};
 
 // Add/Update functions
 export const updateEmployee = (id, updatedData) => {
   const employees = getEmployees();
-  const index = employees.findIndex(emp => emp.id === id);
-  if (index !== -1) {
-    employees[index] = { ...employees[index], ...updatedData };
+  const users = getUsers();
+  
+  const employeeIndex = employees.findIndex(emp => emp.id === id);
+  if (employeeIndex !== -1) {
+    employees[employeeIndex] = { ...employees[employeeIndex], ...updatedData };
     setItem(STORAGE_KEYS.EMPLOYEES, employees);
-    return employees[index];
+    
+    // Also update in users collection
+    const userIndex = users.findIndex(user => user.id === id);
+    if (userIndex !== -1) {
+      users[userIndex] = { ...users[userIndex], ...updatedData };
+      setItem(STORAGE_KEYS.USERS, users);
+    }
+    
+    return employees[employeeIndex];
   }
   return null;
 };
@@ -361,31 +518,44 @@ export const deleteDepartment = (id) => {
 export const addUser = (user) => {
   const users = getUsers();
   const employees = getEmployees();
-  const newUser = { ...user, id: Date.now(), createdAt: new Date().toISOString() };
-  users.push(newUser);
-  
-  // Also add to employees list for admin visibility
+
+  // Generate incremental ID based on existing users
+  const maxId = users.length > 0 ? Math.max(...users.map(u => u.id)) : 0;
+  const newId = maxId + 1;
+
+  // Ensure user object has an incremental ID
+  const newUserForUsersList = { ...user, id: newId, createdAt: new Date().toISOString() };
+  users.push(newUserForUsersList);
+
+  // Create a separate, clean employee object for the employees list
   const newEmployee = {
-    id: newUser.id,
+    id: newId,
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,
+    phone: user.mobile, // Map mobile to phone for consistency
     department: user.department,
     position: user.position,
+    salary: user.salary || 0,
     hireDate: user.hireDate,
-    salary: user.salary,
-    status: user.status || 'inactive'
+    status: user.status || 'active'
   };
   employees.push(newEmployee);
-  
+
   setItem(STORAGE_KEYS.USERS, users);
   setItem(STORAGE_KEYS.EMPLOYEES, employees);
-  return newUser;
+  return newUserForUsersList;
 };
 
 export const addDepartment = (department) => {
   const departments = getDepartments();
-  const newDepartment = { ...department, id: Date.now(), createdAt: new Date().toISOString() };
+  const maxId = departments.length > 0 ? Math.max(...departments.map(d => d.id)) : 0;
+  const newDepartment = { 
+    ...department, 
+    id: maxId + 1, 
+    departmentName: department.name || department.departmentName,
+    createdAt: new Date().toISOString() 
+  };
   departments.push(newDepartment);
   setItem(STORAGE_KEYS.DEPARTMENTS, departments);
   return newDepartment;
@@ -474,17 +644,22 @@ export const deleteJob = (id) => {
 
 export const updateSalaryDetails = (id, updatedData) => {
   const salaryDetails = getSalaryDetails();
-  const index = salaryDetails.findIndex(salary => salary.id === id);
+  const index = salaryDetails.findIndex(detail => detail.id == id);
+  
   if (index !== -1) {
     salaryDetails[index] = { ...salaryDetails[index], ...updatedData };
     setItem(STORAGE_KEYS.SALARY_DETAILS, salaryDetails);
     return salaryDetails[index];
   } else {
-    // If salary details don't exist, create new one
-    const newSalary = { ...updatedData, id: id || Date.now() };
-    salaryDetails.push(newSalary);
+    // Create new salary detail if not found
+    const newSalaryDetail = {
+      id: id || Date.now(),
+      userId: updatedData.userId,
+      ...updatedData
+    };
+    salaryDetails.push(newSalaryDetail);
     setItem(STORAGE_KEYS.SALARY_DETAILS, salaryDetails);
-    return newSalary;
+    return newSalaryDetail;
   }
 };
 
@@ -522,11 +697,54 @@ export const updateApplication = (id, updatedData) => {
 
 export const updateUserInStorage = (updatedUser) => {
   const users = getUsers();
-  const index = users.findIndex(user => user.id == updatedUser.id);
-  if (index !== -1) {
-    users[index] = { ...users[index], ...updatedUser };
+  const employees = getEmployees();
+  
+  // Update in users collection
+  const userIndex = users.findIndex(user => user.id == updatedUser.id);
+  if (userIndex !== -1) {
+    // Parse fullName to firstName and lastName
+    const nameParts = updatedUser.fullName ? updatedUser.fullName.split(' ') : ['', ''];
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
+    
+    // Find department name from departmentId
+    const departments = getDepartments();
+    const selectedDepartment = departments.find(dept => dept.id == updatedUser.departmentId);
+    const departmentName = selectedDepartment ? selectedDepartment.departmentName : 'Unknown';
+    
+    const updatedUserData = {
+      ...users[userIndex],
+      ...updatedUser,
+      firstName: firstName,
+      lastName: lastName,
+      fullname: updatedUser.fullName,
+      department: departmentName,
+      email: updatedUser.emailAddress || updatedUser.email,
+      status: updatedUser.active ? 'active' : 'inactive'
+    };
+    
+    users[userIndex] = updatedUserData;
     setItem(STORAGE_KEYS.USERS, users);
-    return users[index];
+    
+    // Update in employees collection
+    const employeeIndex = employees.findIndex(emp => emp.id == updatedUser.id);
+    if (employeeIndex !== -1) {
+      const updatedEmployeeData = {
+        ...employees[employeeIndex],
+        firstName: firstName,
+        lastName: lastName,
+        email: updatedUser.emailAddress || updatedUser.email,
+        phone: updatedUser.mobile,
+        department: departmentName,
+        position: updatedUserData.position || employees[employeeIndex].position,
+        status: updatedUser.active ? 'active' : 'inactive'
+      };
+      
+      employees[employeeIndex] = updatedEmployeeData;
+      setItem(STORAGE_KEYS.EMPLOYEES, employees);
+    }
+    
+    return updatedUserData;
   }
   return null;
 };

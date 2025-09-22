@@ -84,6 +84,9 @@ const DefaultContainer = () => {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const role = user.role;
   
+  console.log('DefaultContainer - User:', user);
+  console.log('DefaultContainer - Role:', role);
+  
   return (
     <div>
       {role === "admin" ? (
@@ -92,7 +95,10 @@ const DefaultContainer = () => {
         ManagerContainer()
       ) : role === "employee" ? (
         EmployeeContainer()
-      ) : null}
+      ) : (
+        // Default to employee interface if role is missing or invalid
+        EmployeeContainer()
+      )}
     </div>
   )
 }

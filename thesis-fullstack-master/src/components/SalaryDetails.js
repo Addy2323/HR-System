@@ -305,11 +305,18 @@ export default class SalaryDetails extends Component {
     onSubmit = (event) => {
         event.preventDefault()
 
+        let salaryGross = this.state.salaryBasic + this.state.allowanceHouseRent + 
+                         this.state.allowanceMedical + this.state.allowanceSpecial + 
+                         this.state.allowancePhoneBill + this.state.allowanceFuel + 
+                         this.state.allowanceOther;
+        
+        let deductionTotal = this.state.deductionTax + this.state.deductionOther;
+        let salaryNet = salaryGross - deductionTotal;
+
         let data = {
+            userId: this.state.selectedUser,
             employmentType: this.state.employmentType,
             salaryBasic: this.state.salaryBasic,
-            salaryGross: this.salaryGross,
-            salaryNet: this.salaryNet,
             allowanceHouseRent: this.state.allowanceHouseRent,
             allowanceMedical: this.state.allowanceMedical,
             allowanceSpecial: this.state.allowanceSpecial,
@@ -320,22 +327,26 @@ export default class SalaryDetails extends Component {
                             this.state.allowanceFuel + this.state.allowancePhoneBill + this.state.allowanceOther,
             deductionTax: this.state.deductionTax,
             deductionOther: this.state.deductionOther,
-            deductionTotal: this.state.deductionTax + this.state.deductionOther,
-            salaryGross: this.state.salaryBasic + this.state.allowanceHouseRent + 
-                        this.state.allowanceMedical + this.state.allowanceSpecial + 
-                        this.state.allowancePhoneBill + this.state.allowanceFuel + 
-                        this.state.allowanceOther,
-            salaryNet: this.state.salaryBasic + this.state.allowanceHouseRent + 
-                        this.state.allowanceMedical + this.state.allowanceSpecial + 
-                        this.state.allowancePhoneBill + this.state.allowanceFuel + 
-                        this.state.allowanceOther - this.state.deductionTax - this.state.deductionOther
+            deductionTotal: deductionTotal,
+            salaryGross: salaryGross,
+            salaryNet: salaryNet
         }
 
         try {
-            updateSalaryDetails(this.state.financialId, data);
+            console.log('DEBUG: Saving salary details with data:', data);
+            console.log('DEBUG: Financial ID:', this.state.financialId);
+            const result = updateSalaryDetails(this.state.financialId, data);
+            console.log('DEBUG: Update result:', result);
+            
             this.setState({completed: true});
             window.scrollTo(0, 0);
+            
+            // Refresh the page after a short delay to show updated data
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
         } catch (error) {
+            console.error('DEBUG: Error saving salary details:', error);
             this.setState({hasError: true, errMsg: 'Failed to update salary details. Please try again.'});
             window.scrollTo(0, 0);
         }

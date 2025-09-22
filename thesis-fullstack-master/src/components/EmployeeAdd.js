@@ -65,21 +65,29 @@ export default class EmployeeAdd extends Component {
   onSubmit = (e) => {
     this.setState({ hasError: false, errorMsg: "", completed: false });
 
-    let user = {
-      username: this.state.username,
-      password: 1234,
-      fullname: this.state.fistname + " " + this.state.lastname,
-      role: this.state.role,
-      departmentId: this.state.departmentId,
-      active: 1,
-    };
-
     e.preventDefault();
+    
+    // Find department name from departmentId
+    const departments = this.state.departments;
+    const selectedDepartment = departments.find(dept => dept.id == this.state.departmentId);
+    const departmentName = selectedDepartment ? selectedDepartment.departmentName : 'Unknown';
     
     try {
       const newUser = {
-        ...user,
         id: Date.now(),
+        username: this.state.username,
+        password: this.state.password || '1234',
+        firstName: this.state.fistname,
+        lastName: this.state.lastname,
+        fullname: this.state.fistname + " " + this.state.lastname,
+        role: this.state.role || 'employee', // Default to 'employee' if no role selected
+        department: departmentName,
+        departmentId: this.state.departmentId,
+        position: this.state.jobTitle || 'Employee',
+        hireDate: this.state.startDate || new Date().toISOString().split('T')[0],
+        salary: 0,
+        status: 'active',
+        active: 1,
         dateOfBirth: this.state.dateOfBirth,
         gender: this.state.gender,
         maritalStatus: this.state.maritalStatus,
@@ -90,6 +98,7 @@ export default class EmployeeAdd extends Component {
         country: this.state.country,
         mobile: this.state.mobile,
         phone: this.state.phone,
+        email: this.state.email,
         emailAddress: this.state.email,
         bankName: this.state.bankName,
         accountName: this.state.accountName,

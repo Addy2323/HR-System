@@ -102,6 +102,59 @@ export default class EmployeeViewEmployee extends Component {
         <Card>
             <Card.Header style={{ backgroundColor: "#515e73", color: "white", fontSize: '17px' }}>My Profile</Card.Header>
             <Card.Body>
+                <style>{`
+                    .info-row {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: flex-start;
+                        padding: 8px 0;
+                        border-bottom: 1px solid #f0f0f0;
+                        margin-bottom: 5px;
+                        word-wrap: break-word;
+                        overflow-wrap: break-word;
+                    }
+                    .info-row:last-child {
+                        border-bottom: none;
+                        margin-bottom: 0;
+                    }
+                    .info-row strong {
+                        color: #2c3e50;
+                        font-weight: 600;
+                        min-width: 100px;
+                        max-width: 100px;
+                        text-align: left;
+                        flex-shrink: 0;
+                    }
+                    .info-row span {
+                        color: #34495e;
+                        text-align: right;
+                        flex: 1;
+                        margin-left: 10px;
+                        word-break: break-word;
+                        overflow-wrap: break-word;
+                        max-width: calc(100% - 110px);
+                        line-height: 1.4;
+                    }
+                    .emp-view .card-body {
+                        padding: 15px;
+                        overflow: hidden;
+                    }
+                    .emp-view .card-header {
+                        background-color: #3498db !important;
+                        color: white;
+                        font-weight: 600;
+                        text-align: center;
+                    }
+                    .secondary-card {
+                        margin-bottom: 20px;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                        border: 1px solid #e3e6f0;
+                    }
+                    .secondary-card .card-text {
+                        padding: 0;
+                        margin: 0;
+                    }
+                `}</style>
                 <Card.Title><strong>{this.state.user.fullName || `${this.state.user.firstName} ${this.state.user.lastName}`}</strong></Card.Title>
                 <Card.Text>
                     <Col lg={12}>
@@ -126,38 +179,22 @@ export default class EmployeeViewEmployee extends Component {
                                     <Card.Header>Personal Details</Card.Header>
                                     <Card.Body>
                                         <Card.Text id="emp-view-personal-dashboard">
-                                            <Form.Group as={Row}>
-                                                <Form.Label className="label">
-                                                    Date of Birth: 
-                                                </Form.Label>
-                                                <span>
-                                                    {this.state.userPersonalInfo.dateOfBirth}
-                                                </span>
-                                            </Form.Group>
-                                            <Form.Group as={Row}>
-                                                <Form.Label className="label">
-                                                    Gender: 
-                                                </Form.Label>
-                                                <span>
-                                                    {this.state.userPersonalInfo.gender}
-                                                </span>
-                                            </Form.Group>
-                                            <Form.Group as={Row}>
-                                                <Form.Label className="label">
-                                                    Marital Status: 
-                                                </Form.Label>
-                                                <span>
-                                                    {this.state.userPersonalInfo.maritalStatus}
-                                                </span>
-                                            </Form.Group>
-                                            <Form.Group as={Row}>
-                                                <Form.Label className="label">
-                                                    Father's Name: 
-                                                </Form.Label>
-                                                <span>
-                                                    {this.state.userPersonalInfo.fatherName}
-                                                </span>
-                                            </Form.Group>
+                                            <div className="info-row">
+                                                <strong>Date of Birth:</strong>
+                                                <span>{this.state.userPersonalInfo.dateOfBirth || 'N/A'}</span>
+                                            </div>
+                                            <div className="info-row">
+                                                <strong>Gender:</strong>
+                                                <span>{this.state.userPersonalInfo.gender || 'N/A'}</span>
+                                            </div>
+                                            <div className="info-row">
+                                                <strong>Marital Status:</strong>
+                                                <span>{this.state.userPersonalInfo.maritalStatus || 'N/A'}</span>
+                                            </div>
+                                            <div className="info-row">
+                                                <strong>Father's Name:</strong>
+                                                <span>{this.state.userPersonalInfo.fatherName || 'N/A'}</span>
+                                            </div>
                                         </Card.Text>
                                     </Card.Body>
                                 </Card>
@@ -167,38 +204,22 @@ export default class EmployeeViewEmployee extends Component {
                                     <Card.Header>Contact Details</Card.Header>
                                     <Card.Body>
                                         <Card.Text id="emp-view-contact-dashboard">
-                                            <Form.Group as={Row}>
-                                                <Form.Label className="label">
-                                                    Location: 
-                                                </Form.Label>
-                                                <span>
-                                                    {this.state.userPersonalInfo.country}, {this.state.userPersonalInfo.city}
-                                                </span>
-                                            </Form.Group>
-                                            <Form.Group as={Row}>
-                                                <Form.Label className="label">
-                                                    Address: 
-                                                </Form.Label>
-                                                <span>
-                                                    {this.state.userPersonalInfo.address}
-                                                </span>
-                                            </Form.Group>
-                                            <Form.Group as={Row}>
-                                                <Form.Label className="label">
-                                                    Mobile: 
-                                                </Form.Label>
-                                                <span>
-                                                    {this.state.userPersonalInfo.mobile} {this.state.userPersonalInfo.phone ? (' (' + this.state.userPersonalInfo.phone + ')') : null} 
-                                                </span>
-                                            </Form.Group>
-                                            <Form.Group as={Row}>
-                                                <Form.Label className="label">
-                                                    Email Address: 
-                                                </Form.Label>
-                                                <span>
-                                                    {this.state.userPersonalInfo.emailAddress}
-                                                </span>
-                                            </Form.Group>
+                                            <div className="info-row">
+                                                <strong>Location:</strong>
+                                                <span>{this.state.userPersonalInfo.country ? `${this.state.userPersonalInfo.country}, ${this.state.userPersonalInfo.city || ''}` : 'N/A'}</span>
+                                            </div>
+                                            <div className="info-row">
+                                                <strong>Address:</strong>
+                                                <span>{this.state.userPersonalInfo.address || 'N/A'}</span>
+                                            </div>
+                                            <div className="info-row">
+                                                <strong>Mobile:</strong>
+                                                <span>{this.state.userPersonalInfo.mobile || 'N/A'}</span>
+                                            </div>
+                                            <div className="info-row">
+                                                <strong>Email Address:</strong>
+                                                <span>{this.state.userPersonalInfo.emailAddress || 'N/A'}</span>
+                                            </div>
                                         </Card.Text>
                                     </Card.Body>
                                 </Card>
@@ -210,38 +231,22 @@ export default class EmployeeViewEmployee extends Component {
                                     <Card.Header>Bank Information</Card.Header>
                                     <Card.Body>
                                         <Card.Text id="emp-view-bank-dashboard">
-                                            <Form.Group as={Row}>
-                                                <Form.Label className="label">
-                                                    Bank Name: 
-                                                </Form.Label>
-                                                <span>
-                                                    {this.state.userFinancialInfo.bankName}
-                                                </span>
-                                            </Form.Group>
-                                            <Form.Group as={Row}>
-                                                <Form.Label className="label">
-                                                    Account Name: 
-                                                </Form.Label>
-                                                <span>
-                                                    {this.state.userFinancialInfo.accountName}
-                                                </span>
-                                            </Form.Group>
-                                            <Form.Group as={Row}>
-                                                <Form.Label className="label">
-                                                    Account Number: 
-                                                </Form.Label>
-                                                <span>
-                                                    {this.state.userFinancialInfo.accountNumber}
-                                                </span>
-                                            </Form.Group>
-                                            <Form.Group as={Row}>
-                                                <Form.Label className="label">
-                                                    IBAN: 
-                                                </Form.Label>
-                                                <span>
-                                                    {this.state.userFinancialInfo.iban}
-                                                </span>
-                                            </Form.Group>
+                                            <div className="info-row">
+                                                <strong>Bank Name:</strong>
+                                                <span>{this.state.userFinancialInfo.bankName || 'N/A'}</span>
+                                            </div>
+                                            <div className="info-row">
+                                                <strong>Account Name:</strong>
+                                                <span>{this.state.userFinancialInfo.accountName || 'N/A'}</span>
+                                            </div>
+                                            <div className="info-row">
+                                                <strong>Account Number:</strong>
+                                                <span>{this.state.userFinancialInfo.accountNumber || 'N/A'}</span>
+                                            </div>
+                                            <div className="info-row">
+                                                <strong>IBAN:</strong>
+                                                <span>{this.state.userFinancialInfo.iban || 'N/A'}</span>
+                                            </div>
                                         </Card.Text>
                                     </Card.Body>
                                 </Card>

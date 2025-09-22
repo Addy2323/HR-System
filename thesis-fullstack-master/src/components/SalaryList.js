@@ -20,6 +20,10 @@ export default class SalaryList extends Component {
   }
 
   componentDidMount() {
+    this.loadSalaryData();
+  }
+
+  loadSalaryData = () => {
     // Force initialization of users and salary details if empty
     let users = getUsers();
     if (users.length === 0) {
@@ -89,47 +93,8 @@ export default class SalaryList extends Component {
       users = defaultUsers;
     }
 
+    // Get fresh salary details from localStorage
     let salaryDetails = getSalaryDetails();
-    if (salaryDetails.length === 0) {
-      const defaultSalaryDetails = [
-        {
-          id: 1,
-          userId: 1,
-          employmentType: 'Full Time',
-          salaryBasic: 800000,
-          allowanceHouseRent: 200000,
-          allowanceMedical: 50000,
-          allowanceSpecial: 100000,
-          allowanceFuel: 75000,
-          allowancePhoneBill: 25000,
-          allowanceOther: 50000,
-          deductionTax: 120000,
-          deductionOther: 30000,
-          salaryGross: 1300000,
-          deductionTotal: 150000,
-          salaryNet: 1150000
-        },
-        {
-          id: 2,
-          userId: 2,
-          employmentType: 'Full Time',
-          salaryBasic: 1000000,
-          allowanceHouseRent: 250000,
-          allowanceMedical: 75000,
-          allowanceSpecial: 150000,
-          allowanceFuel: 100000,
-          allowancePhoneBill: 30000,
-          allowanceOther: 75000,
-          deductionTax: 180000,
-          deductionOther: 50000,
-          salaryGross: 1680000,
-          deductionTotal: 230000,
-          salaryNet: 1450000
-        }
-      ];
-      localStorage.setItem('hrms_salary_details', JSON.stringify(defaultSalaryDetails));
-      salaryDetails = defaultSalaryDetails;
-    }
     
     // Combine salary details with user information
     const financialInformations = salaryDetails.map(detail => {
@@ -166,6 +131,13 @@ export default class SalaryList extends Component {
     }
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    // Reload data when component receives focus or when navigating back
+    if (prevState.editRedirect && !this.state.editRedirect) {
+      this.loadSalaryData();
+    }
+  }
+
   render() {
 
     const theme = createMuiTheme({
@@ -187,6 +159,14 @@ export default class SalaryList extends Component {
             <Card.Header style={{ backgroundColor: "#515e73", color: "white" }}>
               <div className="panel-title">
                 <strong>List of Employees and Their Salaries</strong>
+                <Button 
+                  variant="light" 
+                  size="sm" 
+                  className="float-right" 
+                  onClick={this.loadSalaryData}
+                >
+                  <i className="fas fa-sync-alt"></i> Refresh
+                </Button>
               </div>
             </Card.Header>
             <Card.Body>

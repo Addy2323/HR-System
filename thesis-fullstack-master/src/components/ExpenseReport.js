@@ -7,7 +7,7 @@ import DeleteModal from './DeleteModal'
 import moment from 'moment'
 import { ThemeProvider } from '@material-ui/core'
 import { createMuiTheme } from '@material-ui/core/styles'
-import { getUsers, getExpenses } from '../utils/localStorage'
+import { getUsers, getExpenses, getDepartments } from '../utils/localStorage'
 
 export default class ExpenseReport extends Component {
   
@@ -31,10 +31,19 @@ export default class ExpenseReport extends Component {
 
       // Use localStorage instead of axios
       const allExpenses = getExpenses();
+      const departments = getDepartments();
       let expenses = []
       allExpenses.map(expense => {
           if(new Date(expense.date).getMonth() == new Date(this.state.selectedDate).getMonth() && new Date(expense.date).getFullYear() == new Date(this.state.selectedDate).getFullYear()) {
-            expenses.push(expense)
+            // Ensure department information is available
+            const department = departments.find(dept => dept.id == expense.departmentId);
+            const expenseWithDept = {
+              ...expense,
+              department: {
+                departmentName: department ? department.departmentName : expense.department?.departmentName || 'Unknown Department'
+              }
+            };
+            expenses.push(expenseWithDept)
           }
       })
       this.setState({expenses: expenses})

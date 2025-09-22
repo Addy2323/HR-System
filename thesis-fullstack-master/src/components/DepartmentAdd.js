@@ -29,18 +29,20 @@ export default class DepartmentAdd extends Component {
     this.setState({ hasError: false, errorMsg: "", completed: false });
 
     let department = {
-      name: this.state.departmentName,
+      departmentName: this.state.departmentName,
       description: `${this.state.departmentName} Department`
     };
 
     try {
-      addDepartment(department);
+      const newDept = addDepartment(department);
       this.setState({
         departmentName: '',
         hasError: false,
         errMsg: ''
       });
       toast.success("Department added successfully!");
+      // Refresh the page to show the new department
+      window.location.reload();
     } catch (error) {
       toast.error("Failed to add department. Department might already exist.");
       window.scrollTo(0, 0);

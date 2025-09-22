@@ -10,7 +10,7 @@ import MaterialTable from 'material-table'
 import { ThemeProvider } from '@material-ui/core'
 import { createMuiTheme } from '@material-ui/core/styles'
 import AlertModal from './AlertModal'
-import { getDepartments, getJobs, deleteJob } from '../utils/localStorage'
+import { getDepartments, getJobs, deleteJob, getUsers } from '../utils/localStorage'
 
 export default class JobList extends Component {
 
@@ -37,6 +37,9 @@ export default class JobList extends Component {
         this.setState({departments: departments}, () => {
             if(this.state.selectedDepartment) {
                 this.fetchData()
+            } else {
+                // Load all jobs by default
+                this.fetchDataAll()
             }
         })
     }
@@ -44,16 +47,28 @@ export default class JobList extends Component {
     fetchData = () => {
         // Use localStorage instead of axios
         const allJobs = getJobs();
+        const departments = getDepartments();
+        const users = getUsers();
         const departmentJobs = allJobs.filter(job => 
             job.departmentId == this.state.selectedDepartment
         );
         
-        // Format dates
-        const formattedJobs = departmentJobs.map(job => ({
-            ...job,
-            startDate: moment(job.startDate).format('YYYY-MM-DD'),
-            endDate: moment(job.endDate).format('YYYY-MM-DD')
-        }));
+        // Format dates and add department names
+        const formattedJobs = departmentJobs.map(job => {
+            const department = departments.find(dept => dept.id == job.departmentId);
+            const assignedUser = job.employeeId ? users.find(user => user.id == job.employeeId) : null;
+            
+            return {
+                ...job,
+                jobTitle: job.title || job.jobTitle || 'Unknown Job',
+                departmentName: department ? department.departmentName : job.department || 'Unknown Department',
+                startDate: job.startDate ? moment(job.startDate).format('YYYY-MM-DD') : moment().format('YYYY-MM-DD'),
+                endDate: job.endDate ? moment(job.endDate).format('YYYY-MM-DD') : moment().add(1, 'year').format('YYYY-MM-DD'),
+                user: {
+                    fullName: assignedUser ? `${assignedUser.firstName} ${assignedUser.lastName}` : 'Unassigned'
+                }
+            }
+        });
         
         this.setState({jobs: formattedJobs})
     }
@@ -61,13 +76,25 @@ export default class JobList extends Component {
     fetchDataAll = () => {
         // Use localStorage instead of axios
         const allJobs = getJobs();
+        const departments = getDepartments();
+        const users = getUsers();
         
-        // Format dates
-        const formattedJobs = allJobs.map(job => ({
-            ...job,
-            startDate: moment(job.startDate).format('YYYY-MM-DD'),
-            endDate: moment(job.endDate).format('YYYY-MM-DD')
-        }));
+        // Format dates and add department names
+        const formattedJobs = allJobs.map(job => {
+            const department = departments.find(dept => dept.id == job.departmentId);
+            const assignedUser = job.employeeId ? users.find(user => user.id == job.employeeId) : null;
+            
+            return {
+                ...job,
+                jobTitle: job.title || job.jobTitle || 'Unknown Job',
+                departmentName: department ? department.departmentName : job.department || 'Unknown Department',
+                startDate: job.startDate ? moment(job.startDate).format('YYYY-MM-DD') : moment().format('YYYY-MM-DD'),
+                endDate: job.endDate ? moment(job.endDate).format('YYYY-MM-DD') : moment().add(1, 'year').format('YYYY-MM-DD'),
+                user: {
+                    fullName: assignedUser ? `${assignedUser.firstName} ${assignedUser.lastName}` : 'Unassigned'
+                }
+            }
+        });
         
         this.setState({jobs: formattedJobs})
     }
@@ -171,6 +198,7 @@ export default class JobList extends Component {
                             columns={[
                                 {title: 'JOB ID', field: 'id'},
                                 {title: 'Job Title', field: 'jobTitle'},
+                                {title: 'Department', field: 'departmentName'},
                                 {title: 'Employee', field: 'user.fullName'},
                                 {title: 'Start Date', field: 'startDate'},
                                 {title: 'End Date', field: 'endDate'},
@@ -197,14 +225,25 @@ export default class JobList extends Component {
                                 {
                                     title: 'Action',
                                     render: rowData => (
-                                        <Form className="row">
-                                            <div className="col pl-5">
-                                                <Button size="sm" variant="info" onClick={this.onEdit(rowData)}><i className="fas fa-edit"></i>Edit</Button>
-                                            </div>
-                                            <div className="col pr-5">
-                                                <Button onClick={this.onDelete(rowData)} size="sm" variant="danger"><i className="fas fa-trash"></i>Delete</Button>
-                                            </div>
-                                        </Form>
+                                        <div className="d-flex gap-2">
+                                            <Button 
+                                                size="sm" 
+                                                variant="info" 
+                                                onClick={this.onEdit(rowData)}
+                                                className="mr-2"
+                                                style={{minWidth: '70px'}}
+                                            >
+                                                <i className="far fa-edit"></i> Edit
+                                            </Button>
+                                            <Button 
+                                                onClick={this.onDelete(rowData)} 
+                                                size="sm" 
+                                                variant="danger"
+                                                style={{minWidth: '70px'}}
+                                            >
+                                                <i className="far fa-trash-alt"></i> Delete
+                                            </Button>
+                                        </div>
                                     )
                                 }
                             ]}

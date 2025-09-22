@@ -572,14 +572,14 @@ export default class Login extends Component {
             
             <form onSubmit={this.onSubmit}>
               <div className="input-group">
-                <label className="input-label">Username</label>
+                <label className="input-label">Employee ID</label>
                 <div className="input-wrapper">
-                  <i className="fas fa-envelope input-icon-left"></i>
+                  <i className="fas fa-id-card input-icon-left"></i>
                   <input
                     type="text"
                     className="form-input"
                     name="username"
-                    placeholder="Enter your username"
+                    placeholder="Enter your Employee ID or Username"
                     value={this.state.username}
                     onChange={this.onChange}
                     required
@@ -627,12 +627,16 @@ export default class Login extends Component {
             <div className="demo-accounts">
               <div className="demo-title">Demo Accounts</div>
               <div className="demo-account">
-                <span className="demo-role">Owner</span>
-                <span className="demo-creds">owner123</span>
+                <span className="demo-role">Admin (ID: 1)</span>
+                <span className="demo-creds">admin123</span>
               </div>
               <div className="demo-account">
-                <span className="demo-role">Admin</span>
-                <span className="demo-creds">admin123</span>
+                <span className="demo-role">Manager (ID: 2)</span>
+                <span className="demo-creds">manager123</span>
+              </div>
+              <div className="demo-account">
+                <span className="demo-role">Employee (ID: 3)</span>
+                <span className="demo-creds">employee123</span>
               </div>
             </div>
             

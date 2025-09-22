@@ -69,7 +69,8 @@ export default class Payment extends Component {
         let items = []
         
         this.state.users.map((user, index) => {
-            items.push(<option key={index} value={user.id}>{user.fullName}</option>)
+            const fullName = `${user.firstName} ${user.lastName}`;
+            items.push(<option key={index} value={user.id}>{fullName}</option>)
             return null;
         })
 
@@ -111,14 +112,14 @@ export default class Payment extends Component {
         
         if (userSalary) {
             this.setState({
-                salaryGross: userSalary.grossSalary,
-                salaryNet: userSalary.netSalary,
-                deductionTotal: userSalary.deductions
+                salaryGross: userSalary.salaryGross,
+                salaryNet: userSalary.salaryNet,
+                deductionTotal: userSalary.deductionTotal
             });
         }
 
         // Get payment history from localStorage
-        const payments = JSON.parse(localStorage.getItem('payments')) || [];
+        const payments = JSON.parse(localStorage.getItem('hrms_payments')) || [];
         const userPayments = payments.filter(payment => payment.userId == this.state.selectedUser);
         this.setState({payments: userPayments, showHistory: true});
     }

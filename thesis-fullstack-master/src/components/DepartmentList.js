@@ -133,14 +133,25 @@ export default class DepartmentList extends Component {
                                 {
                                     title: 'Action',
                                     render: rowData => (
-                                        <Form className="row">
-                                            <div className="col pl-5">
-                                                <Button size="sm" variant="info" onClick={this.onEdit(rowData)}><i className="fas fa-edit"></i>Edit</Button>
-                                            </div>
-                                            <div className="col pr-5">
-                                                <Button onClick={this.onDelete(rowData)} size="sm" variant="danger"><i className="fas fa-trash"></i>Delete</Button>
-                                            </div>
-                                        </Form>
+                                        <div className="d-flex gap-2">
+                                            <Button 
+                                                size="sm" 
+                                                variant="info" 
+                                                onClick={this.onEdit(rowData)}
+                                                className="mr-2"
+                                                style={{minWidth: '70px'}}
+                                            >
+                                                <i className="far fa-edit"></i> Edit
+                                            </Button>
+                                            <Button 
+                                                onClick={this.onDelete(rowData)} 
+                                                size="sm" 
+                                                variant="danger"
+                                                style={{minWidth: '70px'}}
+                                            >
+                                                <i className="far fa-trash-alt"></i> Delete
+                                            </Button>
+                                        </div>
                                     )
                                 }
                             ]}

@@ -22,16 +22,31 @@ export default class EmployeeList extends Component {
   }
 
   componentDidMount() {
+    this.loadEmployees();
+  }
+
+  componentDidUpdate(prevProps) {
+    // Reload employees when returning from edit page
+    if (prevProps.location !== this.props.location) {
+      this.loadEmployees();
+    }
+  }
+
+  loadEmployees = () => {
     const employees = getEmployees();
     // Transform data to match expected format
     const transformedEmployees = employees.map(emp => ({
       id: emp.id,
-      fullName: `${emp.firstName} ${emp.lastName}`,
-      department: { departmentName: emp.department },
-      jobs: [{ jobTitle: emp.position, startDate: emp.hireDate, endDate: '2030-12-31' }],
-      user_personal_info: { mobile: emp.phone || 'N/A' },
+      fullName: `${emp.firstName || ''} ${emp.lastName || ''}`.trim() || 'Unknown Name',
+      department: { departmentName: emp.department || 'Unknown Department' },
+      jobs: [{ 
+        jobTitle: emp.position || 'Unknown Position', 
+        startDate: emp.hireDate || new Date().toISOString().split('T')[0], 
+        endDate: '2030-12-31' 
+      }],
+      user_personal_info: { mobile: emp.phone || emp.mobile || 'N/A' },
       active: emp.status === 'active',
-      status: emp.status || 'inactive'
+      status: emp.status || 'active'
     }));
     this.setState({ users: transformedEmployees });
   }
@@ -103,13 +118,16 @@ export default class EmployeeList extends Component {
                     {
                       title: 'Job Title', 
                       field: 'jobs',
-                      render: rowData => (
-                        rowData.jobs.map((job, index) => {
-                          if(new Date(job.startDate).setHours(0) <= Date.now() && new Date(job.endDate).setHours(24) >= Date.now()) {
-                            return job.jobTitle
-                          }
-                        })
-                      )
+                      render: rowData => {
+                        if (rowData.jobs && rowData.jobs.length > 0) {
+                          const currentJob = rowData.jobs.find(job => 
+                            new Date(job.startDate).setHours(0) <= Date.now() && 
+                            new Date(job.endDate).setHours(24) >= Date.now()
+                          );
+                          return currentJob ? currentJob.jobTitle : rowData.jobs[0].jobTitle;
+                        }
+                        return 'N/A';
+                      }
                     },
                     {title: 'Mobile', field: 'user_personal_info.mobile'},
                     {
@@ -126,20 +144,38 @@ export default class EmployeeList extends Component {
                     {
                       title: 'View',
                       render: rowData => (
-                        <Form>
-                          <Button size="sm" variant="info" onClick={this.onView(rowData)}><i className="far fa-address-card"></i></Button>
-                        </Form>
+                        <Button 
+                          size="sm" 
+                          variant="info" 
+                          onClick={this.onView(rowData)}
+                          style={{minWidth: '50px'}}
+                        >
+                          <i className="far fa-eye"></i>
+                        </Button>
                       )
                     },
                     {
                       title: 'Action',
                       render: rowData => (
-                        <>
-                          <Button size="sm" variant="info" className="mr-2" onClick={this.onEdit(rowData)}><i className="far fa-edit"></i>Edit</Button>
-                          {rowData.id !== JSON.parse(localStorage.getItem('user')).id ? (
-                            <Button size="sm" variant="danger" className="ml-1" onClick={this.onDelete(rowData)}><i className="far fa-bin"></i>Delete</Button>
-                          ):(<></>)}
-                        </>
+                        <div className="d-flex gap-2">
+                          <Button 
+                            size="sm" 
+                            variant="info" 
+                            onClick={this.onEdit(rowData)}
+                            className="mr-2"
+                            style={{minWidth: '70px'}}
+                          >
+                            <i className="far fa-edit"></i> Edit
+                          </Button>
+                          <Button 
+                            onClick={this.onDelete(rowData)} 
+                            size="sm" 
+                            variant="danger"
+                            style={{minWidth: '70px'}}
+                          >
+                            <i className="far fa-trash-alt"></i> Delete
+                          </Button>
+                        </div>
                       )
                     }
                   ]}
