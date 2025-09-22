@@ -36,6 +36,7 @@ export default class EmployeeList extends Component {
           const department = departments.find(dept => dept.id == user.departmentId);
           return {
               ...user,
+              employeeId: user.employeeId || `EMP${String(user.id).padStart(3, '0')}`,
               fullName: user.fullName || `${user.firstName} ${user.lastName}`,
               department: department ? { departmentName: department.departmentName } : { departmentName: 'Unknown' },
               user_personal_info: {
@@ -92,7 +93,12 @@ export default class EmployeeList extends Component {
               <ThemeProvider theme={theme}>
                 <MaterialTable 
                   columns={[
-                    {title: 'EMP ID', field: 'id'},
+                    {
+                      title: 'EMP ID', 
+                      render: rowData => (
+                        rowData.employeeId || `EMP${String(rowData.id).padStart(3, '0')}`
+                      )
+                    },
                     {title: 'Full Name', field: 'fullName'},
                     {title: 'Department', field: 'department.departmentName'},
                     {

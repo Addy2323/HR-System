@@ -391,10 +391,57 @@ export const logoutUser = () => {
 };
 
 // Data management functions
-export const getUsers = () => getItem(STORAGE_KEYS.USERS, []);
+export const getUsers = () => {
+  const users = getItem(STORAGE_KEYS.USERS, []);
+  // Ensure all users have proper sequential employeeId
+  const fixedUsers = users.map((user, index) => {
+    // If user has timestamp-based ID or no proper employeeId, fix it
+    if (!user.employeeId || user.id > 1000000) {
+      const sequentialId = index + 1;
+      return {
+        ...user,
+        id: sequentialId,
+        employeeId: `EMP${String(sequentialId).padStart(3, '0')}`
+      };
+    }
+    return user;
+  });
+  
+  // Save the fixed data back to localStorage
+  if (fixedUsers.some((user, index) => user.id !== users[index]?.id)) {
+    setItem(STORAGE_KEYS.USERS, fixedUsers);
+  }
+  
+  return fixedUsers;
+};
+
 export const getDepartments = () => getItem(STORAGE_KEYS.DEPARTMENTS, []);
 export const getJobs = () => getItem(STORAGE_KEYS.JOBS, []);
-export const getEmployees = () => getItem(STORAGE_KEYS.EMPLOYEES, []);
+
+export const getEmployees = () => {
+  const employees = getItem(STORAGE_KEYS.EMPLOYEES, []);
+  // Ensure all employees have proper sequential employeeId
+  const fixedEmployees = employees.map((employee, index) => {
+    // If employee has timestamp-based ID or no proper employeeId, fix it
+    if (!employee.employeeId || employee.id > 1000000) {
+      const sequentialId = index + 1;
+      return {
+        ...employee,
+        id: sequentialId,
+        employeeId: `EMP${String(sequentialId).padStart(3, '0')}`
+      };
+    }
+    return employee;
+  });
+  
+  // Save the fixed data back to localStorage
+  if (fixedEmployees.some((emp, index) => emp.id !== employees[index]?.id)) {
+    setItem(STORAGE_KEYS.EMPLOYEES, fixedEmployees);
+  }
+  
+  return fixedEmployees;
+};
+
 export const getApplications = () => getItem(STORAGE_KEYS.APPLICATIONS, []);
 export const getPayments = () => getItem(STORAGE_KEYS.PAYMENTS, []);
 export const getExpenses = () => getItem(STORAGE_KEYS.EXPENSES, []);
@@ -515,21 +562,44 @@ export const deleteDepartment = (id) => {
   return true;
 };
 
+// Generate incremental Employee ID
+export const generateEmployeeId = () => {
+  const users = JSON.parse(localStorage.getItem('hrms_users')) || [];
+  const employees = JSON.parse(localStorage.getItem('hrms_employees')) || [];
+  
+  // Get all existing sequential IDs, ignoring timestamp-based IDs
+  const userIds = users.map(u => u.id || 0).filter(id => id < 1000000); // Filter out timestamp IDs
+  const employeeIds = employees.map(e => e.id || 0).filter(id => id < 1000000); // Filter out timestamp IDs
+  const allIds = [...userIds, ...employeeIds];
+  
+  // Find the maximum sequential ID and increment, start from 1 if no valid IDs
+  const maxId = allIds.length > 0 ? Math.max(...allIds) : 0;
+  return maxId + 1;
+};
+
 export const addUser = (user) => {
   const users = getUsers();
   const employees = getEmployees();
 
-  // Generate incremental ID based on existing users
-  const maxId = users.length > 0 ? Math.max(...users.map(u => u.id)) : 0;
-  const newId = maxId + 1;
+  // Generate incremental Employee ID
+  const newEmployeeId = generateEmployeeId();
 
-  // Ensure user object has an incremental ID
-  const newUserForUsersList = { ...user, id: newId, createdAt: new Date().toISOString() };
+  // Create Employee ID in format EMP001, EMP002, etc.
+  const formattedEmployeeId = `EMP${String(newEmployeeId).padStart(3, '0')}`;
+
+  // Ensure user object has an incremental ID and Employee ID
+  const newUserForUsersList = { 
+    ...user, 
+    id: newEmployeeId,
+    employeeId: formattedEmployeeId,
+    createdAt: new Date().toISOString() 
+  };
   users.push(newUserForUsersList);
 
   // Create a separate, clean employee object for the employees list
   const newEmployee = {
-    id: newId,
+    id: newEmployeeId,
+    employeeId: formattedEmployeeId,
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,

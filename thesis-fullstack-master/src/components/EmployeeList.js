@@ -33,22 +33,40 @@ export default class EmployeeList extends Component {
   }
 
   loadEmployees = () => {
-    const employees = getEmployees();
-    // Transform data to match expected format
-    const transformedEmployees = employees.map(emp => ({
-      id: emp.id,
-      fullName: `${emp.firstName || ''} ${emp.lastName || ''}`.trim() || 'Unknown Name',
-      department: { departmentName: emp.department || 'Unknown Department' },
-      jobs: [{ 
-        jobTitle: emp.position || 'Unknown Position', 
-        startDate: emp.hireDate || new Date().toISOString().split('T')[0], 
-        endDate: '2030-12-31' 
-      }],
-      user_personal_info: { mobile: emp.phone || emp.mobile || 'N/A' },
-      active: emp.status === 'active',
-      status: emp.status || 'active'
-    }));
-    this.setState({ users: transformedEmployees });
+    try {
+      const employees = getEmployees();
+      console.log('DEBUG: Raw employees data:', employees);
+      
+      if (!employees || employees.length === 0) {
+        console.log('DEBUG: No employees found, setting empty array');
+        this.setState({ users: [] });
+        return;
+      }
+      
+      const transformedEmployees = employees.map(emp => {
+        if (!emp.firstName || !emp.lastName) {
+          console.warn('DEBUG: Employee missing name fields:', emp);
+          return null;
+        }
+        
+        return {
+          id: emp.id,
+          employeeId: emp.employeeId || `EMP${String(emp.id).padStart(3, '0')}`,
+          fullName: `${emp.firstName} ${emp.lastName}`,
+          department: { departmentName: emp.department || 'Unknown' },
+          jobs: [{ jobTitle: emp.position || 'Employee', startDate: emp.hireDate || new Date().toISOString(), endDate: '2030-12-31' }],
+          user_personal_info: { mobile: emp.phone || 'N/A' },
+          active: emp.status === 'active',
+          status: emp.status || 'inactive'
+        };
+      }).filter(emp => emp !== null);
+      
+      console.log('DEBUG: Transformed employees:', transformedEmployees);
+      this.setState({ users: transformedEmployees });
+    } catch (error) {
+      console.error('DEBUG: Error loading employees:', error);
+      this.setState({ users: [] });
+    }
   }
 
   onView = (user) => {
@@ -75,9 +93,11 @@ export default class EmployeeList extends Component {
     }
   }
 
-  render() {
+  onCloseDeleteModal = () => {
+    this.setState({ deleteModal: false });
+  }
 
-    let closeDeleteModel = () => this.setState({deleteModal: false})
+  render() {
 
     const theme = createMuiTheme({
         overrides: {
@@ -93,26 +113,29 @@ export default class EmployeeList extends Component {
       <div className="container-fluid pt-4">
         {this.state.viewRedirect ? (<Redirect to={{pathname: '/employee-view', state: {selectedUser: this.state.selectedUser}}}></Redirect>) : (<></>)}
         {this.state.editRedirect ? (<Redirect to={{pathname: '/employee-edit', state: {selectedUser: this.state.selectedUser}}}></Redirect>) : (<></>)}
-        {this.state.deleteModal ? (
-          <DeleteModal show={true} onHide={closeDeleteModel} data={this.state.selectedUser} />
-        ) :(<></>)}
-        <h4>
-          <a className="fa fa-plus mb-2 ml-2" href="/employee-add">
-            Add Employee
-          </a>
-        </h4>
+        {this.state.deleteModal ? (<DeleteModal user={this.state.selectedUser} onClose={this.onCloseDeleteModal} onDelete={this.onDelete}></DeleteModal>) : (<></>)}
         <div className="col-sm-12">
           <Card>
             <Card.Header style={{ backgroundColor: "#515e73", color: "white" }}>
               <div className="panel-title">
-                <strong>Employee List</strong>
+                <strong>Employee List ({this.state.users.length} employees)</strong>
               </div>
             </Card.Header>
             <Card.Body>
+              {this.state.users.length === 0 ? (
+                <div className="text-center p-4">
+                  <p>No employees found. Please add employees first.</p>
+                </div>
+              ) : null}
               <ThemeProvider theme={theme}>
                 <MaterialTable 
                   columns={[
-                    {title: 'EMP ID', field: 'id'},
+                    {
+                      title: 'EMP ID', 
+                      render: rowData => (
+                        rowData.employeeId || `EMP${String(rowData.id).padStart(3, '0')}`
+                      )
+                    },
                     {title: 'Full Name', field: 'fullName'},
                     {title: 'Department', field: 'department.departmentName'},
                     {

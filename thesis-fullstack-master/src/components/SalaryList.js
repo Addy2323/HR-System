@@ -173,7 +173,12 @@ export default class SalaryList extends Component {
               <ThemeProvider theme={theme}>
                 <MaterialTable 
                   columns={[
-                    {title: 'EMP ID', field: 'user.id'},
+                    {
+                      title: 'EMP ID', 
+                      render: rowData => (
+                        rowData.user.employeeId || `EMP${String(rowData.user.id).padStart(3, '0')}`
+                      )
+                    },
                     {title: 'Full Name', field: 'user.fullName'},
                     {title: 'Gross Salary', field: 'salaryGross'},
                     {title: 'Deductions', field: 'deductionTotal'},

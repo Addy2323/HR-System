@@ -94,7 +94,7 @@ export default class SalaryView extends Component {
                                             <Col className="pt-4" lg={9}>
                                                 <div className="emp-view-list">
                                                     <ul>
-                                                        <li><span>Employee ID: </span> {this.state.user.id}</li>
+                                                        <li><span>Employee ID: </span> {this.state.user.employeeId || `EMP${String(this.state.user.id).padStart(3, '0')}`}</li>
                                                         <li><span>Department: </span> {this.state.user.department.departmentName}</li>
                                                         <li><span>Job Title: </span> {this.state.currentJobTitle}</li>
                                                         <li><span>Role: </span>{this.state.user.role==='ROLE_ADMIN' ? 'Admin' : this.state.user.role==='ROLE_MANAGER' ? 'Manager' : 'Employee'}</li>

@@ -1,9 +1,12 @@
-import React, { Component } from "react";
-import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { initializeDefaultData } from './utils/localStorage';
-import Header from "./Layout/Header";
+import React, { Component } from 'react';
+import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
+import Login from './components/Login'
+import AdminInterface from './Layout/AdminInterface'
+import ManagerInterface from './Layout/ManagerInterface'
+import EmployeeInterface from './Layout/EmployeeInterface'
+// import './utils/resetEmployeeIds' // Auto-reset Employee IDs to sequential format - Disabled to prevent data conflicts
 import Footer from "./Layout/Footer";
 import SidebarAdmin from "./Layout/SidebarAdmin";
 import SidebarManager from "./Layout/SidebarManager";
@@ -40,7 +43,6 @@ import AnnouncementEmployee from './components/employee/Announcement'
 import Profile from './components/Profile';
 import Register from "./components/Register";
 import withAuth from "./withAuth";
-import Login from "./components/Login";
 import JobList from "./components/JobList";
 import JobListManager from './components/manager/JobList'
 
