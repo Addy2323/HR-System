@@ -25,42 +25,64 @@ export default class DashboardManager extends Component {
       const currentUser = JSON.parse(localStorage.getItem("user") || '{}');
       const departmentId = currentUser.departmentId;
       
-      if (!departmentId) {
-        console.warn('Manager Dashboard: No department ID found for current user');
-        return;
-      }
+      console.log('DEBUG: Manager Dashboard - Current user:', currentUser);
+      console.log('DEBUG: Manager Dashboard - Department ID:', departmentId);
       
       // Fetch Employees Total from both users and employees collections
       const allUsers = getUsers();
       const allEmployees = getEmployees();
       
-      // Filter department employees from both collections
-      const departmentUsers = allUsers.filter(user => user.departmentId == departmentId);
-      const departmentEmployees = allEmployees.filter(emp => emp.departmentId == departmentId);
+      console.log('DEBUG: All users:', allUsers);
+      console.log('DEBUG: All employees:', allEmployees);
       
-      // Use the larger count (in case data exists in both collections)
-      const totalEmployees = Math.max(departmentUsers.length, departmentEmployees.length);
+      let totalEmployees = 0;
+      
+      if (departmentId) {
+        // Filter by department if manager has department
+        const departmentUsers = allUsers.filter(user => user.departmentId == departmentId);
+        const departmentEmployees = allEmployees.filter(emp => emp.departmentId == departmentId);
+        totalEmployees = Math.max(departmentUsers.length, departmentEmployees.length);
+        console.log('DEBUG: Department employees count:', totalEmployees);
+      } else {
+        // Show all employees if no department (fallback for admin/manager)
+        totalEmployees = Math.max(allUsers.length, allEmployees.length);
+        console.log('DEBUG: Total employees count (no dept filter):', totalEmployees);
+      }
+      
       this.setState({ totalEmployees });
 
       // Fetch Expenses Total from localStorage
       const allExpenses = getExpenses();
-      const departmentExpenses = allExpenses.filter(expense => {
-        // Check both users and employees collections for expense owner
-        const userInUsers = allUsers.find(u => u.id == expense.userId);
-        const userInEmployees = allEmployees.find(e => e.id == expense.userId);
-        const user = userInUsers || userInEmployees;
-        return user && user.departmentId == departmentId;
-      });
+      console.log('DEBUG: All expenses:', allExpenses);
+      
+      let departmentExpenses = [];
+      
+      if (departmentId) {
+        // Filter expenses by department
+        departmentExpenses = allExpenses.filter(expense => {
+          return expense.departmentId == departmentId;
+        });
+      } else {
+        // Show all expenses if no department
+        departmentExpenses = allExpenses;
+      }
+      
+      console.log('DEBUG: Department expenses:', departmentExpenses);
       
       if (departmentExpenses.length > 0) {
         const totalExpenses = departmentExpenses.reduce((sum, expense) => {
           const amount = parseFloat(expense.amount) || 0;
           return sum + amount;
         }, 0);
+        console.log('DEBUG: Total expenses amount:', totalExpenses);
         this.setState({ totalExpenses: Math.round(totalExpenses) });
+      } else {
+        this.setState({ totalExpenses: 0 });
       }
     } catch (error) {
       console.error('Manager Dashboard: Error loading data:', error);
+      // Set default values on error
+      this.setState({ totalEmployees: 0, totalExpenses: 0 });
     }
   }
   

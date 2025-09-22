@@ -22,31 +22,47 @@ export default class EmployeeList extends Component {
   }
 
   componentDidMount() {
-      let deptId = JSON.parse(localStorage.getItem('user')).departmentId
-      
-      // Use localStorage instead of axios
-      const allUsers = getUsers();
-      const departments = getDepartments();
-      
-      // Filter users by department
-      const deptUsers = allUsers.filter(user => user.departmentId == deptId);
-      
-      // Format users data to match expected structure
-      const formattedUsers = deptUsers.map(user => {
-          const department = departments.find(dept => dept.id == user.departmentId);
-          return {
-              ...user,
-              employeeId: user.employeeId || `EMP${String(user.id).padStart(3, '0')}`,
-              fullName: user.fullName || `${user.firstName} ${user.lastName}`,
-              department: department ? { departmentName: department.departmentName } : { departmentName: 'Unknown' },
-              user_personal_info: {
-                  mobile: user.mobile
-              },
-              active: user.active !== undefined ? user.active : 1
-          };
-      });
-      
-      this.setState({users: formattedUsers})
+      try {
+          const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+          const deptId = currentUser.departmentId;
+          console.log('DEBUG: Manager departmentId:', deptId);
+          
+          // Use localStorage instead of axios
+          const allUsers = getUsers();
+          const departments = getDepartments();
+          console.log('DEBUG: All users:', allUsers);
+          console.log('DEBUG: All departments:', departments);
+          
+          // If no department ID, show all users (fallback for admin/manager)
+          const deptUsers = deptId ? allUsers.filter(user => user.departmentId == deptId) : allUsers;
+          console.log('DEBUG: Filtered users:', deptUsers);
+          
+          // Format users data to match expected structure
+          const formattedUsers = deptUsers.map(user => {
+              const department = departments.find(dept => dept.id == user.departmentId);
+              return {
+                  ...user,
+                  employeeId: user.employeeId || `EMP${String(user.id).padStart(3, '0')}`,
+                  fullName: user.fullName || `${user.firstName} ${user.lastName}`,
+                  department: department ? { departmentName: department.departmentName } : { departmentName: user.department || 'Unknown' },
+                  user_personal_info: {
+                      mobile: user.mobile || user.phone || 'N/A'
+                  },
+                  active: user.active !== undefined ? user.active : (user.status === 'active' ? 1 : 0),
+                  jobs: [{
+                      jobTitle: user.position || 'Employee',
+                      startDate: user.hireDate || new Date().toISOString(),
+                      endDate: '2030-12-31'
+                  }]
+              };
+          });
+          
+          console.log('DEBUG: Formatted users:', formattedUsers);
+          this.setState({users: formattedUsers})
+      } catch (error) {
+          console.error('Error loading manager employee list:', error);
+          this.setState({users: []});
+      }
   }
 
   onView = (user) => {

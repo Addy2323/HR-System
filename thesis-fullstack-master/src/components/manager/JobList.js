@@ -24,38 +24,52 @@ export default class JobList extends Component {
     }
 
     componentDidMount() {
-        if(this.props.location.state) {
-            this.setState({selectedDepartment: this.props.location.state.selectedDepartment})
-        }
-        let deptId = JSON.parse(localStorage.getItem('user')).departmentId
-        
-        // Use localStorage instead of axios
-        const allUsers = getUsers();
-        const departments = getDepartments();
-        
-        // Filter users by department
-        const deptUsers = allUsers.filter(user => user.departmentId == deptId);
-        
-        // Extract jobs from users
-        let jobs = []
-        deptUsers.forEach(user => {
-            if (user.jobs) {
-                user.jobs.forEach((job, index) => {
-                    // Format job data to match expected structure
-                    const formattedJob = {
-                        ...job,
-                        startDate: moment(job.startDate).format('YYYY-MM-DD'),
-                        endDate: moment(job.endDate).format('YYYY-MM-DD'),
-                        user: {
-                            fullName: user.fullName || `${user.firstName} ${user.lastName}`
-                        }
-                    };
-                    jobs.push(formattedJob);
-                });
+        try {
+            if(this.props.location.state) {
+                this.setState({selectedDepartment: this.props.location.state.selectedDepartment})
             }
-        });
-        
-        this.setState({jobs: jobs});
+            
+            const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+            const deptId = currentUser.departmentId;
+            console.log('DEBUG: Manager Job List departmentId:', deptId);
+            
+            // Import getJobs function
+            const { getJobs } = require('../../utils/localStorage');
+            const allJobs = getJobs();
+            const allUsers = getUsers();
+            const departments = getDepartments();
+            
+            console.log('DEBUG: All jobs:', allJobs);
+            console.log('DEBUG: All users:', allUsers);
+            
+            // Filter jobs by department if manager has department, otherwise show all
+            const deptJobs = deptId ? allJobs.filter(job => job.departmentId == deptId) : allJobs;
+            console.log('DEBUG: Filtered jobs:', deptJobs);
+            
+            // Format jobs with user and department information
+            const formattedJobs = deptJobs.map(job => {
+                const assignedUser = job.employeeId ? allUsers.find(user => user.id == job.employeeId) : null;
+                const department = departments.find(dept => dept.id == job.departmentId);
+                
+                return {
+                    ...job,
+                    id: job.id,
+                    jobTitle: job.title || job.jobTitle || 'Unknown Job',
+                    departmentName: department ? department.departmentName : job.department || 'Unknown Department',
+                    startDate: job.startDate ? moment(job.startDate).format('YYYY-MM-DD') : moment().format('YYYY-MM-DD'),
+                    endDate: job.endDate ? moment(job.endDate).format('YYYY-MM-DD') : moment().add(1, 'year').format('YYYY-MM-DD'),
+                    user: {
+                        fullName: assignedUser ? `${assignedUser.firstName} ${assignedUser.lastName}` : job.employeeName || 'Unassigned'
+                    }
+                };
+            });
+            
+            console.log('DEBUG: Formatted jobs:', formattedJobs);
+            this.setState({jobs: formattedJobs});
+        } catch (error) {
+            console.error('Error loading manager job list:', error);
+            this.setState({jobs: []});
+        }
     }
     
   render() {

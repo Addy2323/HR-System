@@ -73,7 +73,8 @@ export const initializeDefaultData = () => {
         lastName: 'Manager',
         department: 'Human Resources',
         departmentId: 1,
-        position: 'HR Manager'
+        position: 'HR Manager',
+        employeeId: 'EMP002'
       },
       {
         id: 3,

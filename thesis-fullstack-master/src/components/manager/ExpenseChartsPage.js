@@ -8,7 +8,7 @@ export default class ExpenseChartsPage extends React.Component {
 
     this.state = {
       chartData: [],
-      expenseYear: 2021,
+      expenseYear: 2024,
     };
 
     this.onChange = this.onChange.bind(this);
@@ -19,41 +19,62 @@ export default class ExpenseChartsPage extends React.Component {
   }
 
   fetchData = () => {
-    let deptId = JSON.parse(localStorage.getItem("user")).departmentId;
-    
-    // Use localStorage instead of axios
-    const allExpenses = getExpenses();
-    const allUsers = getUsers();
-    
-    // Filter expenses by department
-    const deptExpenses = allExpenses.filter(expense => {
-        const user = allUsers.find(u => u.id == expense.userId);
-        return user && user.departmentId == deptId;
-    });
-    
-    // Filter expenses by year
-    const yearExpenses = deptExpenses.filter(expense => 
-        new Date(expense.date).getFullYear() == this.state.expenseYear
-    );
-    
-    // Group expenses by month
-    const monthlyExpenses = {};
-    yearExpenses.forEach(expense => {
-        const month = new Date(expense.date).getMonth();
-        if (!monthlyExpenses[month]) {
-            monthlyExpenses[month] = 0;
-        }
-        monthlyExpenses[month] += parseInt(expense.amount || 0);
-    });
-    
-    // Transform data to chart format
-    const data = Object.keys(monthlyExpenses).map(month => ({
-        month: this.getMonthName(parseInt(month)),
-        expenses: monthlyExpenses[month]
-    }));
-    
-    let array = this.makeArrayStructure(data);
-    this.setState({ chartData: array });
+    try {
+      const currentUser = JSON.parse(localStorage.getItem("user") || '{}');
+      const deptId = currentUser.departmentId;
+      
+      console.log('DEBUG: ExpenseChart - Department ID:', deptId);
+      
+      // Use localStorage instead of axios
+      const allExpenses = getExpenses();
+      const allUsers = getUsers();
+      
+      console.log('DEBUG: ExpenseChart - All expenses:', allExpenses);
+      
+      // Filter expenses by department - use departmentId directly from expense
+      let deptExpenses = [];
+      if (deptId) {
+        deptExpenses = allExpenses.filter(expense => expense.departmentId == deptId);
+      } else {
+        // Show all expenses if no department
+        deptExpenses = allExpenses;
+      }
+      
+      console.log('DEBUG: ExpenseChart - Department expenses:', deptExpenses);
+      
+      // Filter expenses by year
+      const yearExpenses = deptExpenses.filter(expense => 
+          new Date(expense.date).getFullYear() == this.state.expenseYear
+      );
+      
+      console.log('DEBUG: ExpenseChart - Year expenses:', yearExpenses);
+      
+      // Group expenses by month
+      const monthlyExpenses = {};
+      yearExpenses.forEach(expense => {
+          const month = new Date(expense.date).getMonth();
+          if (!monthlyExpenses[month]) {
+              monthlyExpenses[month] = 0;
+          }
+          monthlyExpenses[month] += parseInt(expense.amount || 0);
+      });
+      
+      console.log('DEBUG: ExpenseChart - Monthly expenses:', monthlyExpenses);
+      
+      // Transform data to chart format
+      const data = Object.keys(monthlyExpenses).map(month => ({
+          month: this.getMonthName(parseInt(month)),
+          expenses: monthlyExpenses[month]
+      }));
+      
+      console.log('DEBUG: ExpenseChart - Chart data:', data);
+      
+      let array = this.makeArrayStructure(data);
+      this.setState({ chartData: array });
+    } catch (error) {
+      console.error('ExpenseChart: Error loading data:', error);
+      this.setState({ chartData: { labels: [], datasets: [] } });
+    }
   };
 
   getMonthName = (monthIndex) => {
@@ -94,11 +115,11 @@ export default class ExpenseChartsPage extends React.Component {
         <div className="mt-1" style={{ textAlign: "center" }}>
           <span className="ml-4">Select Year: </span>
           <select onChange={this.onChange} value={this.state.expenseYear}>
+            <option value="2024">2024</option>
+            <option value="2023">2023</option>
+            <option value="2022">2022</option>
             <option value="2021">2021</option>
             <option value="2020">2020</option>
-            <option value="2019">2019</option>
-            <option value="2018">2018</option>
-            <option value="2017">2017</option>
           </select>
         </div>
         <div>
