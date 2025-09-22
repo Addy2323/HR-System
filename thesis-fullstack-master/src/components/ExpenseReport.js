@@ -20,10 +20,17 @@ export default class ExpenseReport extends Component {
     }
   }
 
-  componentDidMount() {
+componentDidMount() {
     // Use localStorage instead of axios
     const users = getUsers();
     this.setState({users: users});
+
+    // Load expenses for current month by default
+    const currentDate = new Date();
+    const currentMonthDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+    this.setState({selectedDate: currentMonthDate}, () => {
+      this.onSubmit({preventDefault: () => {}});
+    });
   }
 
   onSubmit = (event) => {
@@ -33,9 +40,23 @@ export default class ExpenseReport extends Component {
       const allExpenses = getExpenses();
       const departments = getDepartments();
       let expenses = []
-      allExpenses.map(expense => {
+
+      if (!this.state.selectedDate) {
+        // Show all expenses if no date selected
+        allExpenses.map(expense => {
+          const department = departments.find(dept => dept.id == expense.departmentId);
+          const expenseWithDept = {
+            ...expense,
+            department: {
+              departmentName: department ? department.departmentName : expense.department?.departmentName || 'Unknown Department'
+            }
+          };
+          expenses.push(expenseWithDept);
+        });
+      } else {
+        // Filter by selected month/year
+        allExpenses.map(expense => {
           if(new Date(expense.date).getMonth() == new Date(this.state.selectedDate).getMonth() && new Date(expense.date).getFullYear() == new Date(this.state.selectedDate).getFullYear()) {
-            // Ensure department information is available
             const department = departments.find(dept => dept.id == expense.departmentId);
             const expenseWithDept = {
               ...expense,
@@ -43,9 +64,10 @@ export default class ExpenseReport extends Component {
                 departmentName: department ? department.departmentName : expense.department?.departmentName || 'Unknown Department'
               }
             };
-            expenses.push(expenseWithDept)
+            expenses.push(expenseWithDept);
           }
-      })
+        });
+      }
       this.setState({expenses: expenses})
   }
 

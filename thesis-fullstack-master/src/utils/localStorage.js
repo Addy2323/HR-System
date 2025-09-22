@@ -204,11 +204,13 @@ export const initializeDefaultData = () => {
     const defaultEmployees = [
       {
         id: 1,
+        employeeId: 'EMP001',
         firstName: 'John',
         lastName: 'Doe',
         email: 'john.doe@hrms.com',
         phone: '+255 123 456 789',
         department: 'Information Technology',
+        departmentId: 2,
         position: 'Software Developer',
         salary: 1200000,
         hireDate: '2023-01-15',
@@ -216,14 +218,58 @@ export const initializeDefaultData = () => {
       },
       {
         id: 2,
+        employeeId: 'EMP002',
         firstName: 'Jane',
         lastName: 'Smith',
         email: 'jane.smith@hrms.com',
         phone: '+255 987 654 321',
         department: 'Human Resources',
+        departmentId: 1,
         position: 'HR Manager',
         salary: 1500000,
         hireDate: '2022-06-10',
+        status: 'active'
+      },
+      {
+        id: 3,
+        employeeId: 'EMP003',
+        firstName: 'Mike',
+        lastName: 'Johnson',
+        email: 'mike.johnson@hrms.com',
+        phone: '+255 555 123 456',
+        department: 'Sales',
+        departmentId: 3,
+        position: 'Sales Representative',
+        salary: 800000,
+        hireDate: '2023-03-20',
+        status: 'active'
+      },
+      {
+        id: 4,
+        employeeId: 'EMP004',
+        firstName: 'Sarah',
+        lastName: 'Wilson',
+        email: 'sarah.wilson@hrms.com',
+        phone: '+255 777 987 654',
+        department: 'Marketing',
+        departmentId: 4,
+        position: 'Marketing Specialist',
+        salary: 900000,
+        hireDate: '2023-05-10',
+        status: 'active'
+      },
+      {
+        id: 5,
+        employeeId: 'EMP005',
+        firstName: 'David',
+        lastName: 'Brown',
+        email: 'david.brown@hrms.com',
+        phone: '+255 666 111 222',
+        department: 'Finance',
+        departmentId: 5,
+        position: 'Accountant',
+        salary: 1000000,
+        hireDate: '2023-07-01',
         status: 'active'
       }
     ];
@@ -235,7 +281,7 @@ export const initializeDefaultData = () => {
     const defaultApplications = [
       {
         id: 1,
-        employeeId: 2,
+        employeeId: 1,
         employeeName: 'John Doe',
         type: 'Leave',
         reason: 'Annual Leave',
@@ -245,14 +291,36 @@ export const initializeDefaultData = () => {
         createdAt: new Date().toISOString()
       },
       {
-        id: 175853100236,
-        employeeId: 5,
+        id: 2,
+        employeeId: 2,
         employeeName: 'Jane Smith',
-        type: 'student',
-        reason: 'sijui',
-        startDate: '2025-09-24',
-        endDate: '2026-01-24',
+        type: 'Leave',
+        reason: 'Medical Leave',
+        startDate: '2024-02-10',
+        endDate: '2024-02-15',
+        status: 'approved',
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: 3,
+        employeeId: 3,
+        employeeName: 'Mike Johnson',
+        type: 'Leave',
+        reason: 'Personal Leave',
+        startDate: '2024-03-05',
+        endDate: '2024-03-07',
         status: 'pending',
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: 4,
+        employeeId: 4,
+        employeeName: 'Sarah Wilson',
+        type: 'Training',
+        reason: 'Marketing Workshop',
+        startDate: '2024-04-15',
+        endDate: '2024-04-17',
+        status: 'approved',
         createdAt: new Date().toISOString()
       }
     ];
@@ -279,16 +347,55 @@ export const initializeDefaultData = () => {
   if (!getItem(STORAGE_KEYS.EXPENSES)) {
     const defaultExpenses = [
       {
-        id: 175853061951,
-        expenseItemName: 'wall',
-        expenseItemStore: 'fifi',
-        amount: 100000,
-        date: '2025-09-25',
-        departmentId: 1,
+        id: 1,
+        expenseItemName: 'Office Supplies',
+        expenseItemStore: 'Office Depot',
+        amount: 50000,
+        date: '2024-01-15',
+        departmentId: 2,
         department: {
           departmentName: 'Information Technology'
         },
+        userId: 1,
+        status: 'approved'
+      },
+      {
+        id: 2,
+        expenseItemName: 'Training Materials',
+        expenseItemStore: 'BookStore',
+        amount: 75000,
+        date: '2024-01-20',
+        departmentId: 1,
+        department: {
+          departmentName: 'Human Resources'
+        },
         userId: 2,
+        status: 'approved'
+      },
+      {
+        id: 3,
+        expenseItemName: 'Marketing Brochures',
+        expenseItemStore: 'Print Shop',
+        amount: 30000,
+        date: '2024-02-05',
+        departmentId: 4,
+        department: {
+          departmentName: 'Marketing'
+        },
+        userId: 4,
+        status: 'pending'
+      },
+      {
+        id: 4,
+        expenseItemName: 'Software License',
+        expenseItemStore: 'Microsoft',
+        amount: 200000,
+        date: '2024-02-10',
+        departmentId: 2,
+        department: {
+          departmentName: 'Information Technology'
+        },
+        userId: 1,
         status: 'approved'
       }
     ];

@@ -3,11 +3,13 @@ import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import Login from './components/Login'
-import AdminInterface from './Layout/AdminInterface'
-import ManagerInterface from './Layout/ManagerInterface'
-import EmployeeInterface from './Layout/EmployeeInterface'
+import { Redirect } from 'react-router-dom'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 // import './utils/resetEmployeeIds' // Auto-reset Employee IDs to sequential format - Disabled to prevent data conflicts
+import { initializeDefaultData } from './utils/localStorage'
 import Footer from "./Layout/Footer";
+import Header from "./Layout/Header";
 import SidebarAdmin from "./Layout/SidebarAdmin";
 import SidebarManager from "./Layout/SidebarManager";
 import SidebarEmployee from './Layout/SidebarEmployee'
